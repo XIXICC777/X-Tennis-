@@ -1,0 +1,19 @@
+{
+  "说明":"对 zimo_live_ 和 zimo_demo_ 各自实际使用的集合建索引。数组中的字段全部升序；_id 是内置唯一主键。按控制台要求建立复合索引。",
+  "indexes":{
+    "students":[["active","_id"],["number","_id"]],
+    "bindings":[["userId","verified","active","_id"],["studentId","active","verified","_id"],["studentId","_id"]],
+    "homework":[["date","_id"],["classId","date","subject","_id"]],
+    "tasks":[["homeworkId","_id"],["studentId","_id"],["date","_id"]],
+    "attendance":[["date","_id"],["studentId","_id"]],
+    "mistakes":[["closed","_id"],["studentId","_id"]],
+    "reviews":[["studentId","_id"]],
+    "scores":[["studentId","_id"]],
+    "feedback":[["studentId","_id"]],
+    "goals":[["studentId","_id"]],
+    "progress":[["studentId","_id"]],
+    "handoffs":[["closed","_id"],["studentId","closed","_id"],["studentId","_id"]],
+    "communications":[["closed","_id"],["studentId","_id"]],
+    "emotions":[["studentId","_id"]]
+  }
+}

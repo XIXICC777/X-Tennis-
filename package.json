@@ -1,0 +1,20 @@
+{
+  "name": "zimo-school",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "test": "npm run build && node --test tests/*.test.js",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc -p miniprogram/tsconfig.json",
+    "demo": "node scripts/demo-server.js",
+    "check:demo": "node scripts/check-demo.js"
+  },
+  "devDependencies": {
+    "miniprogram-api-typings": "4.0.8",
+    "miniprogram-compiler": "0.2.3",
+    "typescript": "5.9.3"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

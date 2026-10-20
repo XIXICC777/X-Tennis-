@@ -1,0 +1,1 @@
+{"extends":"./miniprogram/tsconfig.json","include":["miniprogram/**/*.ts"]}
