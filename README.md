@@ -60,6 +60,13 @@ scripts/                         演示服务与辅助命令
 | `npm run build` | 编译小程序 TypeScript |
 | `npm run typecheck` | 类型检查 |
 | `npm test` | 编译并执行全部自动化测试 |
-| `npm run demo` | 启动独立虚构演示服务 |
+| `npm run demo` | 先构建并检查模块，再启动独立虚构演示服务 |
+| `npm run check:bundle` | 检查小程序入口及配置等依赖是否齐全 |
 
-依赖通过锁文件固定。请勿提交密钥、微信上传私钥、真实学生导出或云服务凭证。当前目录中的编译产物已生成，Git 中只保存 TS 源文件，重新克隆后请先构建。
+依赖通过锁文件固定。请勿提交密钥、微信上传私钥、真实学生导出或云服务凭证。当前目录中的编译产物已生成，Git 和下载包同时保存 TS 源文件及已编译 JS；修改 TS 或环境配置后仍须构建。`npm run demo` 会先自动构建并检查包括 config.js 在内的页面依赖，构建失败不会启动服务。
+
+## Mac 与 Windows 终端
+
+Mac 使用 `npm ci`、`npm run build`、`npm run demo`。Windows PowerShell 若提示 npm.ps1 被禁用，将命令中的 npm 改为 npm.cmd，不必修改系统执行策略。运行前进入同时包含 package.json 与 project.config.json 的项目目录。
+
+若开发者工具显示 `module config.js is not defined`：先在同一个项目根目录运行 `npm run build`，看到“模块检查通过”后，在开发者工具选择“清缓存 → 全部清除”并重新编译。确保没有启用额外的TypeScript编译插件，本项目使用预编译JS。不要删掉 config.js 或手改生成的JS；应修改 config.ts 后重新构建。

@@ -1,5 +1,4 @@
 node_modules/
-miniprogram/**/*.js
 miniprogram/**/*.js.map
 project.private.config.json
 .env

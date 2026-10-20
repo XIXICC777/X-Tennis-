@@ -43,3 +43,9 @@
 ℹ skipped 0
 ℹ todo 0
 ℹ duration_ms 312.610551
+
+2026-10-20 配置模块交付修复验证：
+npm run typecheck：通过。
+npm test：31项通过，0失败，0跳过。
+新增验证：config.js缺失时报错、独立模块注册表实际加载App及Page。
+构建输出：小程序模块检查通过：4个模块（含 config.js），页面依赖完整。

@@ -1,1 +1,20 @@
-{"compilerOptions":{"target":"ES2019","module":"commonjs","strict":true,"noImplicitAny":false,"esModuleInterop":true,"types":["miniprogram-api-typings"],"skipLibCheck":true,"lib":["ES2020"],"sourceMap":true},"include":["**/*.ts"]}
+{
+  "compilerOptions": {
+    "target": "ES2019",
+    "module": "commonjs",
+    "strict": true,
+    "noImplicitAny": false,
+    "esModuleInterop": true,
+    "types": [
+      "miniprogram-api-typings"
+    ],
+    "skipLibCheck": true,
+    "lib": [
+      "ES2020"
+    ],
+    "sourceMap": false
+  },
+  "include": [
+    "**/*.ts"
+  ]
+}
