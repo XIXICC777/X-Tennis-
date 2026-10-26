@@ -54,3 +54,10 @@ npm test：31项通过，0失败，0跳过。
 npm run typecheck：通过。
 npm test：33项通过，0失败，0跳过。
 已验证cloud/local-demo各自调用路径，未验证真实微信云环境。
+
+Node.js16.13兼容验证：
+npm run typecheck：通过。
+npm test：35项通过，0失败，0跳过。
+官方Node16.13.0二进制SHA256校验通过。
+真实v16.13.0：会话、发布、更新、家长读取、越权拒绝、重试（内存与云适配器替身）均通过；wx-server-sdk与云函数入口加载通过。
+未连接用户真实云数据库。

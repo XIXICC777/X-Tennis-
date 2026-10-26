@@ -1,3 +1,4 @@
+const {clone}=require('./clone');
 // 云开发事务内仅使用 doc().get/set；集合查询在事务外执行。
 // 每个被扫描或写入的表都锁定 meta 修订文档，提交时递增；并发写会冲突并由 SDK 重试。
 // 所有业务写入必须经过此适配器；控制台修改数据前应暂停服务。
@@ -12,9 +13,9 @@ class CloudStore {
   const tx={
    get:async(t,id)=>{
     if(!id||typeof id!=='string')return null;const key=t+':'+id;
-    if(pending.has(key))return structuredClone(pending.get(key).value);
+    if(pending.has(key))return clone(pending.get(key).value);
     if(!cache.has(key))cache.set(key,unpack(await collection(t).doc(id).get()));
-    return structuredClone(cache.get(key));
+    return clone(cache.get(key));
    },
    list:async(t,filter={})=>{
     const listKey=t+':'+JSON.stringify(filter);const matches=r=>Object.entries(filter).every(([k,v])=>r[k]===v);
@@ -24,7 +25,7 @@ class CloudStore {
      for(;;){const res=check(await this.db.collection(this.prefix+t).where(filter).orderBy('_id','asc').skip(skip).limit(100).get());rows.push(...res.data);if(res.data.length<100)break;skip+=100;if(skip>=10000)throw new Error('超过首版单次查询10000条扫描上限，请归档或升级分页接口');}
      lists.set(listKey,rows.map(r=>{delete r._id;return r;}));
     }
-    const mapped=new Map(lists.get(listKey).map(r=>[r.id,r]));for(const item of pending.values())if(item.t===t&&matches(item.value))mapped.set(item.id,item.value);return structuredClone([...mapped.values()]);
+    const mapped=new Map(lists.get(listKey).map(r=>[r.id,r]));for(const item of pending.values())if(item.t===t&&matches(item.value))mapped.set(item.id,item.value);return clone([...mapped.values()]);
    },
    set:async(t,id,value)=>{await guard(t);pending.set(t+':'+id,{t,id,value:JSON.parse(JSON.stringify(value))});}
   };
