@@ -13,10 +13,10 @@ test('发布模块检查发现缺失的config.js并阻止不完整构建',t=>{
 });
 test('使用独立模块注册表加载已编译App和Page，配置依赖完整且可启动',()=>{
  const files=verifyMiniprogram(root);const registry=new Map(files.map(f=>[path.relative(root,f).split(path.sep).join('/'),fs.readFileSync(f,'utf8')]));
- const cache=new Map();let app,page;
+ const cache=new Map();let app,page,cloudInitialization;
  function load(name){if(cache.has(name))return cache.get(name).exports;const source=registry.get(name);if(!source)throw Error(`module '${name}' is not defined`);const mod={exports:{}};cache.set(name,mod);
   const requireLocal=request=>{let target=path.posix.normalize(path.posix.join(path.posix.dirname(name),request));if(!target.endsWith('.js'))target+='.js';return load(target);};
-  vm.runInNewContext(source,{module:mod,exports:mod.exports,require:requireLocal,App:d=>app=d,Page:d=>page=d,wx:{},console,setTimeout,clearTimeout},{filename:name});return mod.exports;
+  vm.runInNewContext(source,{module:mod,exports:mod.exports,require:requireLocal,App:d=>app=d,Page:d=>page=d,wx:{cloud:{init(options){cloudInitialization=options;}}},console,setTimeout,clearTimeout},{filename:name});return mod.exports;
  }
- load('app.js');load('pages/workspace/index.js');assert.equal(typeof app.onLaunch,'function');assert.doesNotThrow(()=>app.onLaunch());assert.equal(page.data.demo,true);assert.equal(typeof page.refresh,'function');assert.equal(cache.get('config.js').exports.config.mode,'local-demo');
+ load('app.js');load('pages/workspace/index.js');assert.equal(typeof app.onLaunch,'function');assert.doesNotThrow(()=>app.onLaunch());const config=cache.get('config.js').exports.config;assert.equal(page.data.demo,config.mode==='local-demo');assert.equal(typeof page.refresh,'function');if(config.mode==='cloud'){assert.equal(cloudInitialization.env,config.envId);}else{assert.equal(cloudInitialization,undefined);}
 });

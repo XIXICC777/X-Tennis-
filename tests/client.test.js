@@ -1,6 +1,6 @@
 const {test}=require('node:test');const assert=require('node:assert/strict');
 test('客户端保存失败明确报错、保留表单、不显示保存成功，重试沿用请求编号',async()=>{
- const payloads=[];global.wx={request(opts){payloads.push(opts.data);opts.success({statusCode:200,data:{ok:false,error:{message:'数据库写入失败'}}});},showToast(){}};
+ const payloads=[];global.wx={request(opts){payloads.push(opts.data);opts.success({statusCode:200,data:{ok:false,error:{message:'数据库写入失败'}}});},cloud:{async callFunction(opts){payloads.push(opts.data);return {result:{ok:false,error:{message:'数据库写入失败'}}};}},showToast(){}};
  let definition;global.Page=d=>{definition=d;};require('../miniprogram/pages/workspace/index.js');
  const state=structuredClone(definition.data);state.form={title:'尚未保存的输入'};
  const page={...definition,data:state,setData(patch){Object.assign(this.data,patch);}};
