@@ -7,7 +7,9 @@ const demo=process.env.DEMO_MODE==='true';
 const prefix=demo?'zimo_demo_':'zimo_live_';
 exports.main=async(event)=>{
  try{
-  const ctx=cloud.getWXContext();const db=cloud.database();
+  const ctx=cloud.getWXContext();
+  // 查询不存在的幂等请求/当日到店记录属于正常首次写入，须返回null而非SDK异常。
+  const db=cloud.database({throwOnNotFound:false});
   if(event.action==='initialize'){
    if(ctx.OPENID)throw new Error('初始化只允许云控制台执行，不允许小程序调用');
    if(!demo&&!process.env.BOOTSTRAP_OPENID)throw new Error('请先配置首位管理员 BOOTSTRAP_OPENID');

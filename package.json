@@ -14,7 +14,8 @@
   "devDependencies": {
     "miniprogram-api-typings": "4.0.8",
     "miniprogram-compiler": "0.2.3",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "wx-server-sdk": "3.0.1"
   },
   "engines": {
     "node": ">=18"
