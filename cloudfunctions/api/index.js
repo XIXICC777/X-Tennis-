@@ -8,16 +8,21 @@ const prefix=demo?'zimo_demo_':'zimo_live_';
 exports.main=async(event)=>{
  try{
   const ctx=cloud.getWXContext();
+  // 首位管理员配置前即可获取调用者本人身份；不读数据库，不接受客户端指定身份。
+  if(event.action==='identity'){
+   if(!ctx.OPENID)return {ok:false,error:{code:'AUTH',message:'请从已登录的微信小程序调用，云控制台测试没有个人微信身份'}};
+   return {ok:true,data:{openid:ctx.OPENID}};
+  }
   // 查询不存在的幂等请求/当日到店记录属于正常首次写入，须返回null而非SDK异常。
   const db=cloud.database({throwOnNotFound:false});
   if(event.action==='initialize'){
-   if(ctx.OPENID)throw new Error('初始化只允许云控制台执行，不允许小程序调用');
-   if(!demo&&!process.env.BOOTSTRAP_OPENID)throw new Error('请先配置首位管理员 BOOTSTRAP_OPENID');
+   if(ctx.OPENID)throw Object.assign(new Error('初始化只允许云控制台执行，不允许小程序调用'),{code:'FORBIDDEN'});
+   if(!demo&&!process.env.BOOTSTRAP_OPENID)throw Object.assign(new Error('请先在云函数环境变量中配置首位管理员 BOOTSTRAP_OPENID'),{code:'SETUP'});
    for(const t of [...tables,'meta']){try{await db.createCollection(prefix+t);}catch(e){if(!/exist|已存在/i.test(e.message||e.errMsg||''))throw e;}}
    for(const t of tables){const exists=await db.collection(prefix+'meta').where({_id:t}).get();if(!exists.data.length)await db.collection(prefix+'meta').doc(t).set({data:{revision:0}});}
    if(demo){const seed=demoSeed();for(const [t,rows]of Object.entries(seed))for(const [id,r]of Object.entries(rows)){
     const exists=await db.collection(prefix+t).where({_id:id}).get();if(!exists.data.length)await db.collection(prefix+t).doc(id).set({data:r});
-   }}else{const id=hash('live:'+process.env.BOOTSTRAP_OPENID).slice(0,32);const ref=db.collection(prefix+'users').doc(id);const exists=await db.collection(prefix+'users').where({_id:id}).get();if(!exists.data.length)await ref.set({data:{id,openid:process.env.BOOTSTRAP_OPENID,name:'机构管理员',roles:['admin','teacher','lead'],enabled:true}});}
+   }}else{const id=hash('live:'+process.env.BOOTSTRAP_OPENID).slice(0,32);const ref=db.collection(prefix+'users').doc(id);const exists=await db.collection(prefix+'users').where({_id:id}).get();const previous=exists.data[0]||{};delete previous._id;await ref.set({data:{...previous,id,openid:process.env.BOOTSTRAP_OPENID,name:previous.name||'机构管理员',roles:[...new Set([...(previous.roles||[]),'admin','teacher','lead'])],enabled:true}});}
    return {ok:true,data:{message:'初始化完成；请检查数据库及存储权限规则'}};
   }
   // 演示身份仅在独立演示环境允许；正式环境完全忽略客户端身份。
@@ -26,5 +31,5 @@ exports.main=async(event)=>{
    putFile:async(path,buf)=>(await cloud.uploadFile({cloudPath:path,fileContent:buf})).fileID,
    getFile:async id=>(await cloud.downloadFile({fileID:id})).fileContent.toString('base64')});
   const data=await api(identity,event.action,event.input||{});return {ok:true,data,demo};
- }catch(e){const known=['AUTH','INVALID','FORBIDDEN','NOT_FOUND','CONFLICT'].includes(e.code);return {ok:false,error:{code:known?e.code:'SERVER',message:known?e.message:'操作失败，请检查云环境配置或联系管理员；数据未确认保存'}};}
+ }catch(e){const known=['AUTH','INVALID','FORBIDDEN','NOT_FOUND','CONFLICT','SETUP'].includes(e.code);return {ok:false,error:{code:known?e.code:'SERVER',message:known?e.message:'操作失败，请检查云环境配置或联系管理员；数据未确认保存'}};}
 };
